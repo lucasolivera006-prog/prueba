@@ -131,12 +131,17 @@ class ApifyClient:
 
     @_retry()
     def _run(self, actor: str, payload: dict) -> list[dict]:
+        # No APIFY_TOKEN: send no token and rely on a cloud environment's
+        # network secret, which adds "Authorization: Bearer" for api.apify.com.
+        params = {"token": self.token} if self.token else None
         try:
             r = requests.post(RUN_SYNC.format(actor=actor),
-                              params={"token": self._require()}, json=payload,
+                              params=params, json=payload,
                               timeout=self.timeout)
         except requests.RequestException as e:
             err = ApifyError(f"network error: {e}"); err.status = 503; raise err
+        if r.status_code == 401 and not self.token:
+            self._require()
         if r.status_code >= 400:
             err = ApifyError(f"actor returned {r.status_code}: {r.text[:200]}")
             err.status = r.status_code; raise err

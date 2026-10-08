@@ -20,7 +20,7 @@ Not for writing a caption (use `ig-caption-writer`) or planning a carousel (use 
 
 ## Setup (optional)
 
-The read layer uses **Apify** (no login, no cookies). Get a free token at `https://console.apify.com/account/integrations` and set `APIFY_TOKEN`. No token? Paste the posts or profile stats you already have and the skill runs the same analysis on them.
+The read layer uses **Apify** (no login, no cookies). Get a free token at `https://console.apify.com/account/integrations` and set `APIFY_TOKEN`. In this repo's cloud environment the token is stored as a network secret for `api.apify.com` instead, so `APIFY_TOKEN` is unset on purpose: call the client anyway and the agent proxy adds the key. No token? Paste the posts or profile stats you already have and the skill runs the same analysis on them.
 
 ## Input
 
