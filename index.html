@@ -863,6 +863,73 @@
       })(window, document, "clarity", "script", "ylwcm7bw9i");
   </script>
   <!-- End Microsoft Clarity Code -->
+
+  <!-- PostHog Code -->
+  <script>
+  /* PostHog: visitas, toques en WhatsApp (qué botón), scroll, tiempo con la página
+     a la vista y grabaciones. Mismo proyecto que lucasolipa.com: esta web se
+     distingue por el dominio y por "pagina": "clasica" en sus eventos.
+     Eventos: whatsapp ("ubicacion": menu, portada, servicios, precio o final),
+     scroll ("porcentaje": 25, 50, 75 o 90) y tiempo_en_pagina ("segundos": 30,
+     60, 120 o 300). Scroll y tiempo salen una vez por visita. */
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],Object.defineProperty(u,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e}}),Object.defineProperty(u.people,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(){return u.toString(1)+".people (stub)"}}),o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_ozWrwUdV786JNoSsGEGxmewanZN2cNv4j7Anpm5RwE6p', {
+    api_host: 'https://us.i.posthog.com',
+    defaults: '2026-08-30'
+  });
+  (function () {
+    var PAGINA = 'clasica';
+    // Cada botón de WhatsApp abre un mensaje distinto: así se sabe cuál tocaron
+    var BOTONES = [
+      ['tramites de dgi y bps', 'menu'],
+      ['sobre tus servicios contables', 'portada'],
+      ['servicios que ofreces', 'servicios'],
+      ['costo del servicio mensual', 'precio'],
+      ['ordenar mi contabilidad', 'final']
+    ];
+    function ubicacion(href) {
+      var texto = '';
+      try { texto = decodeURIComponent((href.split('text=')[1] || '').replace(/\+/g, ' ')); } catch (e) {}
+      texto = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      for (var i = 0; i < BOTONES.length; i++) {
+        if (texto.indexOf(BOTONES[i][0]) !== -1) return BOTONES[i][1];
+      }
+      return 'otro';
+    }
+    var enviados = {};
+    function unaVez(clave, nombre, datos) {
+      if (enviados[clave]) return;
+      enviados[clave] = true;
+      datos.pagina = PAGINA;
+      posthog.capture(nombre, datos);
+    }
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]');
+      if (!a) return;
+      posthog.capture('whatsapp', { pagina: PAGINA, ubicacion: ubicacion(a.getAttribute('href')) }, { transport: 'sendBeacon' });
+    }, true);
+    function onScroll() {
+      var total = document.documentElement.scrollHeight - window.innerHeight;
+      if (total < 100) return;
+      var pct = window.scrollY / total * 100;
+      [25, 50, 75, 90].forEach(function (m) {
+        if (pct >= m) unaVez('scroll' + m, 'scroll', { porcentaje: m });
+      });
+      if (pct >= 90) window.removeEventListener('scroll', onScroll);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    var segundos = 0;
+    var reloj = setInterval(function () {
+      if (document.hidden) return;
+      segundos++;
+      if (segundos === 30 || segundos === 60 || segundos === 120 || segundos === 300) {
+        unaVez('tiempo' + segundos, 'tiempo_en_pagina', { segundos: segundos });
+      }
+      if (segundos >= 300) clearInterval(reloj);
+    }, 1000);
+  })();
+  </script>
+  <!-- End PostHog Code -->
 </head>
 <body>
 

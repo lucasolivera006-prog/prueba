@@ -18,7 +18,7 @@ SRC, OUT = sys.argv[1], sys.argv[2]
 src = open(SRC, encoding='utf-8').read()
 
 css = re.search(r'<style>\n(.*?)\n  </style>', src, re.S).group(1)
-tracking = re.search(r'(  <!-- Meta Pixel Code -->.*?<!-- End Microsoft Clarity Code -->)', src, re.S).group(1)
+tracking = re.search(r'(  <!-- Meta Pixel Code -->.*?<!-- End PostHog Code -->)', src, re.S).group(1)
 body = re.search(r'<body>\n(.*?)\n<script>\n\(\(\) => \{', src, re.S).group(1)
 js = re.search(r'\n<script>\n(\(\(\) => \{.*?\}\)\(\);)\n</script>\n</body>', src, re.S).group(1)
 fonts = re.search(r'(  <link rel="preconnect" href="https://fonts.googleapis.com">.*?rel="stylesheet" />)', src, re.S).group(1)
@@ -257,9 +257,10 @@ header = """<!-- ===============================================================
        · Elementor: widget «HTML»   ·   Editor de bloques: bloque «HTML personalizado»
      ===================================================================== -->
 
-<!-- Pixel de Meta y Microsoft Clarity.
-     Si ya los tenés instalados en todo el sitio (con un plugin o en el encabezado),
-     borrá desde esta línea hasta «End Microsoft Clarity Code» para no contar visitas dobles. -->
+<!-- Pixel de Meta, Microsoft Clarity y PostHog.
+     Si el Pixel o Clarity ya están instalados en todo el sitio (con un plugin o en el encabezado),
+     borrá desde esta línea hasta «End Microsoft Clarity Code» para no contar visitas dobles.
+     PostHog (desde «PostHog Code» hasta «End PostHog Code») dejalo siempre. -->
 """
 
 tracking_out = '\n'.join(l[2:] if l.startswith('  ') else l for l in tracking.split('\n'))
